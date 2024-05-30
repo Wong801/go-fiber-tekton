@@ -2,7 +2,6 @@
 
 ## Tech Stack
 * [Golang](https://go.dev/)
-* [ZeroLog](https://github.com/rs/zerolog)
 * [Fiber](https://gofiber.io/)
 * [Sqlc](https://sqlc.dev/)
 * [Viper](https://github.com/spf13/viper)
