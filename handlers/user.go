@@ -3,15 +3,28 @@ package handlers
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"log"
 	"time"
 
 	"git.finsoft.id/finsoft.id/go-example/usecase"
 	"github.com/gofiber/fiber/v2"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
+// Profile Login
+// @Summary      Login Endpoint
+// @Description  User Login
+// @Tags         Login
+// @Accept       json
+// @Produce      json
+// @Param        email body string true "Email"
+// @Param        password body string true "Password"
+// @Success      200  {object}  handlers.Response
+// @Router       /login [post]
+// @Security Bearer
 func Login(c *fiber.Ctx) error {
 	loginReq := new(LoginRequest)
 	if err := c.BodyParser(loginReq); err != nil {
@@ -28,11 +41,29 @@ func Login(c *fiber.Ctx) error {
 		return err
 	}
 
+	// Create the Claims
+	claims := jwt.MapClaims{
+		"email": loginReq.Email,
+		"admin": true,
+		"exp":   time.Now().Add(time.Hour * 72).Unix(),
+		// add more non-sensitve information here
+	}
+
+	// Create token
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+
+	// Generate encoded token and send it as response.
+	t, err := token.SignedString([]byte("secret"))
+	if err != nil {
+		log.Printf("token.SignedString: %v", err)
+		return c.SendStatus(fiber.StatusInternalServerError)
+	}
+
 	resp := Response{
 		Success: true,
 		Code:    "LOGIN.SUCCESS",
 		Message: "login success",
-		Data:    nil,
+		Data:    fiber.Map{"token": t},
 	}
 
 	return c.JSON(resp)
@@ -107,11 +138,11 @@ func GetUser(c *fiber.Ctx) error {
 func SendRabbitMQMessage(c *fiber.Ctx) error {
 	q, err := usecase.RabbitMQChannel.QueueDeclare(
 		"greetings", // name
-		true,    // durable
-		false,   // delete when unused
-		false,   // exclusive
-		false,   // no-wait
-		nil,     // arguments
+		true,        // durable
+		false,       // delete when unused
+		false,       // exclusive
+		false,       // no-wait
+		nil,         // arguments
 	)
 	if err != nil {
 		return err
@@ -140,6 +171,31 @@ func SendRabbitMQMessage(c *fiber.Ctx) error {
 		Code:    "RABBITMQ.SEND",
 		Message: "Send message success",
 		Data:    body,
+	}
+
+	return c.JSON(resp)
+}
+
+// Profile UserInfo
+// @Summary      Testing UserInfo Endpoint
+// @Description  Get JWT Token Information
+// @Tags         UserInfo Info
+// @Accept       json
+// @Produce      json
+// @Success      200  {object}  handlers.Response
+// @Router       /authenticated [post]
+// @Security Bearer
+func UserInfo(c *fiber.Ctx) error {
+	user := c.Locals("user").(*jwt.Token)
+	claims := user.Claims.(jwt.MapClaims)
+
+	resp := Response{
+		Success: true,
+		Code:    "SUCCESS",
+		Message: "login success",
+		Data: map[string]string{
+			"message": fmt.Sprintf("Welcome %s", claims["email"]),
+		},
 	}
 
 	return c.JSON(resp)

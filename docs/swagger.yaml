@@ -1,0 +1,83 @@
+basePath: /
+definitions:
+  handlers.Response:
+    properties:
+      code:
+        type: string
+      data: {}
+      message:
+        type: string
+      success:
+        type: boolean
+    type: object
+externalDocs:
+  description: OpenAPI
+  url: https://swagger.io/resources/open-api/
+host: localhost:8888
+info:
+  contact:
+    email: polma@finsoft.id
+    name: Polma Tambunan
+    url: https://www.polmatambunan.my.id/
+  description: Ini adalah contoh Finsoft API.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Finsoft API
+  version: "1.0"
+paths:
+  /authenticated:
+    post:
+      consumes:
+      - application/json
+      description: Get JWT Token Information
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.Response'
+      security:
+      - Bearer: []
+      summary: Testing Authenticated Endpoint
+      tags:
+      - Authenticated Info
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: User Login
+      parameters:
+      - description: Email
+        in: body
+        name: email
+        required: true
+        schema:
+          type: string
+      - description: Password
+        in: body
+        name: password
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.Response'
+      security:
+      - Bearer: []
+      summary: Login Endpoint
+      tags:
+      - Login
+securityDefinitions:
+  Bearer:
+    description: Type "Bearer" followed by a space and JWT token.
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

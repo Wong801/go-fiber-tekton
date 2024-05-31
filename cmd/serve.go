@@ -11,6 +11,8 @@ import (
 	"git.finsoft.id/finsoft.id/go-example/db"
 	"git.finsoft.id/finsoft.id/go-example/handlers"
 	"git.finsoft.id/finsoft.id/go-example/usecase"
+	jwtware "github.com/gofiber/contrib/jwt"
+	"github.com/gofiber/contrib/swagger"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/healthcheck"
 	"github.com/gofiber/fiber/v2/middleware/recover"
@@ -46,12 +48,12 @@ to quickly create a Cobra application.`,
 		usecase.DbConn = dbConn
 		usecase.Queries = db.New(dbConn)
 
-    	opts, err := redis.ParseURL(viper.GetString("GOX_REDIS_DSN"))
-    	if err != nil {
-        	panic(err)
-    	}
+		opts, err := redis.ParseURL(viper.GetString("GOX_REDIS_DSN"))
+		if err != nil {
+			panic(err)
+		}
 
-    	rdb := redis.NewClient(opts)
+		rdb := redis.NewClient(opts)
 
 		usecase.Redis = rdb
 
@@ -88,6 +90,17 @@ to quickly create a Cobra application.`,
 			// 	return "static-id"
 			// },
 		}))
+
+		// init swagger
+		cfg := swagger.Config{
+			BasePath: "/api/v1/",
+			FilePath: "./docs/swagger.json",
+			Path:     "docs",
+			Title:    "Finsoft API Docs",
+		}
+
+		app.Use(swagger.New(cfg))
+
 		app.Use(healthcheck.New(healthcheck.Config{
 			LivenessProbe: func(c *fiber.Ctx) bool {
 				return true
@@ -98,9 +111,19 @@ to quickly create a Cobra application.`,
 			},
 			ReadinessEndpoint: "/healthz",
 		}))
+		jwtMiddleware := jwtware.New(jwtware.Config{
+			SigningKey: jwtware.SigningKey{Key: []byte("secret")},
+		})
 
 		app.Get("/users", handlers.GetUsers)
+
+		// kalo ketemu case kayak gini, ada 2 endpoint yg patternnya tabrakan,
+		// yg non param taroh di atas karena kalo yg param ditaroh di atas,
+		// ntar yg non param langsung dianggap param.
+		// Sebisa mungkin dibikin nggak tabrakan ya.
+		app.Get("/user/info", jwtMiddleware, handlers.UserInfo)
 		app.Get("/user/:user_id", handlers.GetUser)
+
 		app.Post("/register", handlers.Register)
 		app.Post("/login", handlers.Login)
 
