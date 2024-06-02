@@ -161,9 +161,5 @@ func comparePasswordAndHash(password, encoded string) bool {
 	}
 
 	comparisonHash := argon2.IDKey([]byte(password), salt, params.MinIterations, params.MinMemorySize, params.Parallelism, params.KeyLength)
-	if subtle.ConstantTimeCompare(hash, comparisonHash) == 1 {
-		return true
-	}
-
-	return false
+	return subtle.ConstantTimeCompare(hash, comparisonHash) == 1
 }
