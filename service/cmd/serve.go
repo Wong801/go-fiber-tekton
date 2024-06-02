@@ -8,9 +8,9 @@ import (
 	"fmt"
 	"log"
 
-	"git.finsoft.id/finsoft.id/go-example/db"
-	"git.finsoft.id/finsoft.id/go-example/handlers"
-	"git.finsoft.id/finsoft.id/go-example/usecase"
+	"git.finsoft.id/finsoft.id/go-example/service/db"
+	"git.finsoft.id/finsoft.id/go-example/service/handlers"
+	"git.finsoft.id/finsoft.id/go-example/service/usecase"
 	jwtware "github.com/gofiber/contrib/jwt"
 	"github.com/gofiber/contrib/swagger"
 	"github.com/gofiber/fiber/v2"

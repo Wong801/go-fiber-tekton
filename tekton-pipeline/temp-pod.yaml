@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: temp-pod
+spec:
+  containers:
+  - name: temp-container
+    image: busybox
+    command: [ "sh", "-c", "sleep 3600" ]
+    volumeMounts:
+    - mountPath: /mnt/data/source
+      name: source-volume
+  volumes:
+  - name: source-volume
+    persistentVolumeClaim:
+      claimName: pvc-claim
+  restartPolicy: Never

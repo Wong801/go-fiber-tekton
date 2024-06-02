@@ -7,7 +7,7 @@ import (
 	"log"
 	"time"
 
-	"git.finsoft.id/finsoft.id/go-example/usecase"
+	"git.finsoft.id/finsoft.id/go-example/service/usecase"
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"

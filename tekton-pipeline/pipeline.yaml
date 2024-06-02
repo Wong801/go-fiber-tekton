@@ -1,0 +1,45 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: build-and-deploy
+  namespace: default
+spec:
+  workspaces:
+    - name: source
+    - name: dockerconfig
+  params:
+    - name: SERVICE_IMAGE
+      type: string
+    - name: CONSUMER_IMAGE
+      type: string
+  tasks:
+    - name: build-consumer-image
+      taskRef:
+        name: kaniko
+      params:
+        - name: IMAGE
+          value: $(params.CONSUMER_IMAGE)
+        - name: DOCKERFILE
+          value: Dockerfile
+        - name: CONTEXT
+          value: consumer
+      workspaces:
+        - name: source
+          workspace: source
+        - name: dockerconfig
+          workspace: dockerconfig
+    - name: build-service-image
+      taskRef:
+        name: kaniko
+      params:
+        - name: IMAGE
+          value: $(params.SERVICE_IMAGE)
+        - name: DOCKERFILE
+          value: Dockerfile
+        - name: CONTEXT
+          value: service
+      workspaces:
+        - name: source
+          workspace: source
+        - name: dockerconfig
+          workspace: dockerconfig

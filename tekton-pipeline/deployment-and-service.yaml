@@ -1,0 +1,78 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: postgres
+  namespace: default
+spec:
+  type: ExternalName
+  # https://docs.docker.com/docker-for-mac/networking/#use-cases-and-workarounds
+  externalName: host.docker.internal
+  ports:
+    - name: port
+      port: 5432
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: service-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: go-service
+  template:
+    metadata:
+      labels:
+        app: go-service
+    spec:
+      containers:
+        - name: go-service
+          image: wong801/web-service:latest
+          ports:
+            - containerPort: 8080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: consumer-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: go-consumer
+  template:
+    metadata:
+      labels:
+        app: go-consumer
+    spec:
+      containers:
+        - name: go-consumer
+          image: wong801/web-consumer:latest
+          ports:
+            - containerPort: 8081
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: go-service
+spec:
+  selector:
+    app: go-service
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+  type: NodePort
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: go-consumer
+spec:
+  selector:
+    app: go-consumer
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8081
+  type: NodePort

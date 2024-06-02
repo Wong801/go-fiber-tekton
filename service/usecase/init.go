@@ -1,11 +1,11 @@
 package usecase
 
 import (
-	"git.finsoft.id/finsoft.id/go-example/db"
-	"git.finsoft.id/finsoft.id/go-example/lib/slack"
+	"git.finsoft.id/finsoft.id/go-example/service/db"
+	"git.finsoft.id/finsoft.id/go-example/service/lib/slack"
 	"github.com/jackc/pgx/v5"
-	"github.com/redis/go-redis/v9"
 	amqp "github.com/rabbitmq/amqp091-go"
+	"github.com/redis/go-redis/v9"
 )
 
 var DbConn *pgx.Conn

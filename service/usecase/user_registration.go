@@ -9,7 +9,7 @@ import (
 	"log"
 	"strings"
 
-	"git.finsoft.id/finsoft.id/go-example/db"
+	"git.finsoft.id/finsoft.id/go-example/service/db"
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
 	"golang.org/x/crypto/argon2"
