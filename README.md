@@ -66,6 +66,8 @@ Feel free to run this command after all completed
 
 ## Running Service
 
+Edit the image source in deployment task to match your dockerhub image
+
 ```bash
   $ kubectl apply -f tekton-pipeline/deployment-and-service.yaml
 ```
