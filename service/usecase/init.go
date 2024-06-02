@@ -6,6 +6,7 @@ import (
 	"github.com/jackc/pgx/v5"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"github.com/redis/go-redis/v9"
+	"github.com/spf13/viper"
 )
 
 var DbConn *pgx.Conn
@@ -16,7 +17,7 @@ var Slack slack.SlackClient
 
 func init() {
 	Slack = slack.SlackClient{
-		WebHookUrl: "https://hooks.slack.com/services/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",
+		WebHookUrl: viper.GetString("GOX_SLACK_WEBHOOK_URL"),
 		UserName:   "testing-alert-please-ignore",
 		Channel:    "service-alert",
 	}
